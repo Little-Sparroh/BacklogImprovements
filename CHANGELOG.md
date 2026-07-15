@@ -1,15 +1,21 @@
 # Changelog
 
-## 1.0.0 (2025-12-02)
+## 2.1.0
 
-### Features
-* Add preselect path functionality for directive pages
-* Implement automatic progression through selected directive sequences
-* Add F1 key binding to toggle preselect mode
-* Add visual feedback for preselected directives (yellow outline)
-* Automatic reward claiming and next directive activation
+### Merge
+* Combined **PreselectBacklog**, **FreeBacklogPages**, and **RerollBacklog** into **BacklogImprovements**
+* Single SparrohUILib toolbar for path + reroll controls
+* Mutual exclusion between path-edit and reroll-select modes
+* Feature toggles: `EnablePreselect`, `EnableReroll`, `EnableFreePages`
+* Reroll UI/copy uses **gats** (in-game currency name)
+* Migrates saved paths from legacy `sparroh.preselectbacklog.txt`
+* New GUID `sparroh.backlogimprovements` — uninstall the three old mods
 
-### Tech
-* Initial mod conversion from template
-* Implement Harmony patches for DirectiveButton and DirectiveWindow
-* Add client-side directive automation system
+### From PreselectBacklog 2.0.0
+* Path preselect, UI lines/badges, auto-claim, auto-activate, force-complete
+
+### From FreeBacklogPages 1.0.0
+* Free next backlog page (no resource cost)
+
+### From RerollBacklog 1.0.0
+* Reroll page / reroll one for configurable gats cost
