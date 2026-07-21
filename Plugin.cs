@@ -26,7 +26,7 @@ public class BacklogImprovementsPlugin : BaseUnityPlugin
     public static ConfigEntry<int> CostPerDirective;
 
     /// <summary>Dev-only. Must edit source and rebuild to enable force-complete (F2).</summary>
-    private const bool sparrohmode = false;
+    private const bool sparrohmode = true;
 
     private Harmony _harmony;
     private InputAction _forceCompleteAction;
