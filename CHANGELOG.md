@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.2
+
+### Fixes
+* **EnableFreePages** hot-reloads immediately in both directions (on→off and off→on)
+* Free pages no longer mutates the vanilla next-page cost array — Harmony intercepts unlock UI + charge using a tracked next-page button and the live config value
+* Reloads config from disk when the `.cfg` changes (fallback if a settings UI only writes the file)
+* Pair with **ModSettingsMenu 2.0.1+** so toggles update the live `ConfigEntry` and fire `SettingChanged`
+
+
 ## 2.1.0
 
 ### Merge
