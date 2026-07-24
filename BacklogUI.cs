@@ -83,6 +83,7 @@ public static class BacklogUI
         if (!preselect && !reroll)
             return;
 
+
         int id = window.GetInstanceID();
         if (States.TryGetValue(id, out var existing) && existing.Root != null)
         {
@@ -91,19 +92,30 @@ public static class BacklogUI
             ExitRerollSelection(existing);
             RefreshAll(existing);
             if (preselect)
+            {
                 PathVisualizer.Refresh(window);
+                PathLogic.TryAutoProgress(window);
+            }
             return;
         }
 
         var state = BuildUi(window, preselect, reroll);
         if (state == null)
+        {
+            if (preselect)
+                PathLogic.TryAutoProgress(window);
             return;
+        }
 
         States[id] = state;
         RefreshAll(state);
         if (preselect)
+        {
             PathVisualizer.Refresh(window);
+            PathLogic.TryAutoProgress(window);
+        }
     }
+
 
     public static void OnWindowClosed(DirectiveWindow window)
     {
@@ -129,22 +141,28 @@ public static class BacklogUI
 
         FreePages.ApplyFreeNextPage(window);
 
-        if (!States.TryGetValue(window.GetInstanceID(), out var state))
-            return;
+        bool preselect = BacklogImprovementsPlugin.EnablePreselect?.Value != false;
+        bool hasState = States.TryGetValue(window.GetInstanceID(), out var state);
 
-        state.Window = window;
-        RefreshAll(state);
-
-        if (BacklogImprovementsPlugin.EnablePreselect?.Value != false)
+        if (hasState)
         {
-            PathVisualizer.Refresh(window);
-            if (!PathLogic.IsEditing)
-                PathLogic.TryAutoClaim(window);
+            state.Window = window;
+            RefreshAll(state);
         }
 
-        if (state.RerollSelecting)
+        // Auto-progress even when UI state is not built yet (OnOpen → SetupDirectives
+        // runs before the OnOpen postfix creates toolbar state).
+        if (preselect && !PathLogic.IsEditing)
+        {
+            if (hasState)
+                PathVisualizer.Refresh(window);
+            PathLogic.TryAutoProgress(window);
+        }
+
+        if (hasState && state.RerollSelecting)
             RebuildRerollOverlays(state);
     }
+
 
     public static void CleanupAll()
     {

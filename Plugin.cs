@@ -13,7 +13,8 @@ public class BacklogImprovementsPlugin : BaseUnityPlugin
 {
     public const string PluginGUID = "sparroh.backlogimprovements";
     public const string PluginName = "BacklogImprovements";
-    public const string PluginVersion = "2.1.2";
+    public const string PluginVersion = "2.1.3";
+
 
     /// <summary>Legacy PreselectBacklog GUID — used only to migrate saved paths.</summary>
     public const string LegacyPreselectGuid = "sparroh.preselectbacklog";

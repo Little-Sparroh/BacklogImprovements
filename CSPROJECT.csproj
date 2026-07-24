@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <AssemblyName>BacklogImprovements</AssemblyName>
         <Product>BacklogImprovements</Product>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

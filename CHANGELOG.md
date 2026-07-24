@@ -1,6 +1,13 @@
 # Changelog
 
+## 2.1.3
+
+### Fixes
+* **Auto-activate next path node on completion** — finishing a preselected directive now claims rewards and activates the next path node immediately, without reopening the backlog menu
+* Menu open / refresh also recovers claim + activate if progress was interrupted earlier
+
 ## 2.1.2
+
 
 ### Fixes
 * **EnableFreePages** hot-reloads immediately in both directions (on→off and off→on)

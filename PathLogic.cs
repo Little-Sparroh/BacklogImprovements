@@ -184,6 +184,74 @@ public static class PathLogic
     }
 
     /// <summary>
+    /// Claim any claimable path node, then activate the next path node if nothing is blocking.
+    /// Safe to call with the backlog closed (window may be null).
+    /// </summary>
+    public static bool TryAutoProgress(DirectiveWindow window = null)
+    {
+        if (IsEditing)
+            return false;
+        if (BacklogImprovementsPlugin.EnablePreselect?.Value == false)
+            return false;
+
+        bool claimed = TryAutoClaim(window);
+        // Claim postfix already tries activate; still recover if claim was a no-op
+        // (e.g. already claimed earlier but next node never activated).
+        bool activated = false;
+        if (!HasBlockingDirective())
+            activated = TryActivateNext(window);
+
+        return claimed || activated;
+    }
+
+    /// <summary>
+    /// When a path directive finishes (Complete → Deactivate), claim rewards and
+    /// activate the next path node without requiring the backlog menu to be open.
+    /// </summary>
+    public static void OnDirectiveCompleted(DirectiveInstance completed, DirectiveWindow window = null)
+    {
+        if (IsEditing || completed == null)
+            return;
+        if (BacklogImprovementsPlugin.EnablePreselect?.Value == false)
+            return;
+
+        if (!IsOnCurrentPath(completed))
+            return;
+
+        if (window == null)
+            window = UnityEngine.Object.FindObjectOfType<DirectiveWindow>();
+
+        if (completed.CanClaimRewards())
+        {
+            if (_autoClaimBusy)
+                return;
+
+            _autoClaimBusy = true;
+            try
+            {
+                int idx = IndexOf(completed);
+                completed.ClaimRewards();
+                // Claim postfix activates the next path node.
+                window?.SetupDirectives();
+                BacklogImprovementsPlugin.Log?.LogInfo(
+                    $"Auto-claimed completed path node {(idx >= 0 ? idx.ToString() : "?")}.");
+            }
+            catch (Exception ex)
+            {
+                BacklogImprovementsPlugin.Log?.LogError($"Auto-claim on complete failed: {ex.Message}");
+            }
+            finally
+            {
+                _autoClaimBusy = false;
+            }
+            return;
+        }
+
+        if (!HasBlockingDirective())
+            TryActivateNext(window);
+    }
+
+    /// <summary>
     /// After a claim, if the claimed directive was on the path, activate the next path node.
     /// </summary>
     public static void OnDirectiveClaimed(DirectiveInstance claimed, DirectiveWindow window = null)
@@ -198,6 +266,7 @@ public static class PathLogic
 
         TryActivateNext(window);
     }
+
 
     /// <summary>
     /// While editing, any non-active non-complete default directive can be selected.

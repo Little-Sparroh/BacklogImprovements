@@ -77,11 +77,38 @@ static class DirectiveWindowUpdatePatch
             return;
         }
 
-        // Light auto-claim poll while the window is open.
+        // Light auto-progress poll while the window is open (claim + activate).
         if (BacklogImprovementsPlugin.EnablePreselect?.Value != false)
-            PathLogic.TryAutoClaim(__instance);
+            PathLogic.TryAutoProgress(__instance);
     }
 }
+
+[HarmonyPatch(typeof(DirectiveInstance), "Complete")]
+static class DirectiveInstanceCompletePatch
+{
+    /// <summary>
+    /// Vanilla Complete only deactivates. Auto-claim + auto-activate the next path
+    /// node immediately so progress does not wait for the backlog menu to open.
+    /// </summary>
+    static void Postfix(DirectiveInstance __instance)
+    {
+        try
+        {
+            if (BacklogImprovementsPlugin.EnablePreselect?.Value == false)
+                return;
+
+            if (PathLogic.IsEditing)
+                return;
+
+            PathLogic.OnDirectiveCompleted(__instance);
+        }
+        catch (Exception ex)
+        {
+            BacklogImprovementsPlugin.Log?.LogError($"DirectiveInstance.Complete postfix: {ex.Message}");
+        }
+    }
+}
+
 
 [HarmonyPatch(typeof(DirectiveButton))]
 static class DirectiveButtonPatches
